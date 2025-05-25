@@ -1,0 +1,6 @@
+{"timestamp":"2024-05-24T23:22:00.000Z","level":"INFO","service":"spacetimedb","module":"core","message":"Starting SpacetimeDB server","version":"1.0.0","environment":"local-development"}
+{"timestamp":"2024-05-24T23:22:01.000Z","level":"INFO","service":"spacetimedb","module":"wasm","message":"Loading WASM module","module_id":"chat_module","module_size":524288}
+{"timestamp":"2024-05-24T23:22:02.000Z","level":"DEBUG","service":"spacetimedb","module":"database","message":"Executing query","query_type":"INSERT","table":"users","trace_id":"12345678901234567890123456789012"}
+{"timestamp":"2024-05-24T23:22:03.000Z","level":"INFO","service":"spacetimedb","module":"telemetry","message":"Metrics exported","metrics_count":42,"export_duration_ms":15}
+{"timestamp":"2024-05-24T23:22:04.000Z","level":"WARN","service":"spacetimedb","module":"performance","message":"Slow query detected","query_duration_ms":250,"table":"messages"}
+{"timestamp":"2024-05-24T23:22:05.000Z","level":"ERROR","service":"spacetimedb","module":"wasm","message":"WASM execution failed","error":"Out of memory","module_id":"heavy_computation"}

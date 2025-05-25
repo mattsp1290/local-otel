@@ -1,0 +1,31 @@
+# HELP spacetimedb_database_operations_total Total number of database operations
+# TYPE spacetimedb_database_operations_total counter
+spacetimedb_database_operations_total{operation="insert",table="users"} 42
+spacetimedb_database_operations_total{operation="select",table="users"} 156
+spacetimedb_database_operations_total{operation="update",table="users"} 23
+spacetimedb_database_operations_total{operation="delete",table="users"} 8
+spacetimedb_database_operations_total{operation="insert",table="messages"} 89
+spacetimedb_database_operations_total{operation="select",table="messages"} 234
+
+# HELP spacetimedb_wasm_execution_duration_seconds WASM function execution time in seconds
+# TYPE spacetimedb_wasm_execution_duration_seconds histogram
+spacetimedb_wasm_execution_duration_seconds_bucket{module="chat",function="send_message",le="0.01"} 2
+spacetimedb_wasm_execution_duration_seconds_bucket{module="chat",function="send_message",le="0.025"} 8
+spacetimedb_wasm_execution_duration_seconds_bucket{module="chat",function="send_message",le="0.05"} 12
+spacetimedb_wasm_execution_duration_seconds_bucket{module="chat",function="send_message",le="0.1"} 15
+spacetimedb_wasm_execution_duration_seconds_bucket{module="chat",function="send_message",le="+Inf"} 15
+spacetimedb_wasm_execution_duration_seconds_sum{module="chat",function="send_message"} 0.3755
+spacetimedb_wasm_execution_duration_seconds_count{module="chat",function="send_message"} 15
+
+# HELP spacetimedb_active_connections Number of active client connections
+# TYPE spacetimedb_active_connections gauge
+spacetimedb_active_connections 8
+
+# HELP spacetimedb_memory_usage_bytes Memory usage in bytes
+# TYPE spacetimedb_memory_usage_bytes gauge
+spacetimedb_memory_usage_bytes{type="heap"} 134217728
+spacetimedb_memory_usage_bytes{type="stack"} 8388608
+
+# HELP spacetimedb_wasm_modules_loaded Number of loaded WASM modules
+# TYPE spacetimedb_wasm_modules_loaded gauge
+spacetimedb_wasm_modules_loaded 3
