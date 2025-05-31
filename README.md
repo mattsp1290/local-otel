@@ -252,6 +252,28 @@ ls -la data/processed/
 ./scripts/setup/setup-telemetry-env.sh
 ```
 
+## 🎯 Examples
+
+The `examples/` directory contains fully instrumented applications demonstrating best practices:
+
+### Available Examples
+
+#### 🐍 Python FastAPI Example
+- **Location**: `examples/python-fastapi/`
+- **Features**: OpenTelemetry auto-instrumentation, StatsD metrics, structured JSON logging
+- **Endpoints**: `/chirp` (health), `/nest` (create), `/flock` (list)
+- **Quick Start**:
+  ```bash
+  cd examples/python-fastapi
+  docker-compose up --build
+  python test_telemetry.py  # Verify telemetry
+  ```
+
+### 📚 Common Documentation
+- **[Telemetry Patterns](examples/common/telemetry-patterns.md)** - Universal patterns for traces, metrics, and logs
+- **[Troubleshooting Guide](examples/common/troubleshooting.md)** - Diagnose and fix common telemetry issues
+- **[Performance Tips](examples/common/performance-tips.md)** - Optimize telemetry overhead
+
 ## 🤖 AI Agent Usage
 
 This environment is specifically designed for AI agents to add and verify observability:
