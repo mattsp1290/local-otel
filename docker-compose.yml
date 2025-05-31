@@ -4,7 +4,7 @@ services:
   # OpenTelemetry Collector
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
-    container_name: spacetimedb-otel-collector
+    container_name: telemetry-nest-otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./docker/configs/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml
@@ -28,7 +28,7 @@ services:
   # StatsD Server
   statsd:
     image: statsd/statsd:latest
-    container_name: spacetimedb-statsd
+    container_name: telemetry-nest-statsd
     volumes:
       - ./docker/configs/statsd/config.js:/usr/src/app/config.js
       - ./data/metrics:/data/metrics
@@ -44,7 +44,7 @@ services:
   # Prometheus
   prometheus:
     image: prom/prometheus:latest
-    container_name: spacetimedb-prometheus
+    container_name: telemetry-nest-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -69,7 +69,7 @@ services:
   # Grafana
   grafana:
     image: grafana/grafana:latest
-    container_name: spacetimedb-grafana
+    container_name: telemetry-nest-grafana
     volumes:
       - grafana-data:/var/lib/grafana
       - ./docker/configs/grafana/provisioning:/etc/grafana/provisioning
@@ -94,7 +94,7 @@ services:
   # Jaeger (for trace visualization)
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: spacetimedb-jaeger
+    container_name: telemetry-nest-jaeger
     ports:
       - "16686:16686" # Jaeger UI
       - "14250:14250" # gRPC
@@ -112,7 +112,7 @@ services:
   # Filebeat (for log processing)
   filebeat:
     image: elastic/filebeat:8.11.0
-    container_name: spacetimedb-filebeat
+    container_name: telemetry-nest-filebeat
     user: root
     volumes:
       - ./docker/configs/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
@@ -129,10 +129,10 @@ services:
 networks:
   telemetry-network:
     external: true
-    name: spacetimedb-telemetry-network
+    name: telemetry-nest-network
 
 volumes:
   prometheus-data:
-    name: spacetimedb-prometheus-data
+    name: telemetry-nest-prometheus-data
   grafana-data:
-    name: spacetimedb-grafana-data
+    name: telemetry-nest-grafana-data

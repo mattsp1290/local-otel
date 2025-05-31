@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SpacetimeDB Telemetry Pipeline Test Script
+Agent Observability Verifier - Telemetry Pipeline Test Script
 
 This script tests the telemetry pipeline by sending sample data to the local
 OpenTelemetry environment and verifying the data is properly processed.
@@ -79,18 +79,18 @@ class TelemetryTester:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             
-            # Sample SpacetimeDB metrics
+            # Sample Canary API metrics
             metrics = [
-                "spacetimedb.database.inserts:1|c|#table:users",
-                "spacetimedb.database.selects:1|c|#table:users",
-                "spacetimedb.database.insert_duration:25|ms|#table:users",
-                "spacetimedb.database.select_duration:5|ms|#table:users",
-                "spacetimedb.wasm.function_calls:1|c|#module:chat,function:send_message",
-                "spacetimedb.wasm.execution_time:150|ms|#module:chat,function:send_message",
-                "spacetimedb.api.requests:1|c|#method:POST,path:/database/call,status:200",
-                "spacetimedb.api.request_duration:45|ms|#method:POST,path:/database/call",
-                "spacetimedb.system.memory_usage:1024|g",
-                "spacetimedb.system.cpu_usage:25.5|g"
+                "canary.requests:1|c|#endpoint:chirp,method:GET",
+                "canary.requests:1|c|#endpoint:nest,method:POST",
+                "canary.response_time:25|ms|#endpoint:chirp",
+                "canary.response_time:45|ms|#endpoint:nest",
+                "canary.request_size:512|g|#endpoint:nest",
+                "canary.active_connections:8|g",
+                "canary.cache_hits:1|c|#endpoint:chirp",
+                "canary.cache_misses:1|c|#endpoint:flock",
+                "canary.error_rate:0.02|g|#endpoint:chirp",
+                "canary.websocket_connections:3|g"
             ]
             
             for metric in metrics:
@@ -116,29 +116,29 @@ class TelemetryTester:
                     {
                         "resource": {
                             "attributes": [
-                                {"key": "service.name", "value": {"stringValue": "spacetimedb"}},
-                                {"key": "service.version", "value": {"stringValue": "dev"}},
+                                {"key": "service.name", "value": {"stringValue": "canary-api"}},
+                                {"key": "service.version", "value": {"stringValue": "1.0.0"}},
                                 {"key": "deployment.environment", "value": {"stringValue": "local-development"}}
                             ]
                         },
                         "scopeSpans": [
                             {
                                 "scope": {
-                                    "name": "spacetimedb-tracer",
+                                    "name": "canary-api-tracer",
                                     "version": "1.0.0"
                                 },
                                 "spans": [
                                     {
                                         "traceId": "12345678901234567890123456789012",
                                         "spanId": "1234567890123456",
-                                        "name": "database.insert",
-                                        "kind": 3,  # SPAN_KIND_CLIENT
+                                        "name": "GET /chirp",
+                                        "kind": 2,  # SPAN_KIND_SERVER
                                         "startTimeUnixNano": int(time.time() * 1_000_000_000),
                                         "endTimeUnixNano": int((time.time() + 0.025) * 1_000_000_000),
                                         "attributes": [
-                                            {"key": "db.table", "value": {"stringValue": "users"}},
-                                            {"key": "db.operation", "value": {"stringValue": "insert"}},
-                                            {"key": "db.rows_affected", "value": {"intValue": "1"}}
+                                            {"key": "http.method", "value": {"stringValue": "GET"}},
+                                            {"key": "http.path", "value": {"stringValue": "/chirp"}},
+                                            {"key": "http.status_code", "value": {"intValue": "200"}}
                                         ],
                                         "status": {"code": 1}  # STATUS_CODE_OK
                                     },
@@ -146,14 +146,14 @@ class TelemetryTester:
                                         "traceId": "12345678901234567890123456789012",
                                         "spanId": "2345678901234567",
                                         "parentSpanId": "1234567890123456",
-                                        "name": "wasm.function_call",
-                                        "kind": 2,  # SPAN_KIND_SERVER
+                                        "name": "cache_lookup",
+                                        "kind": 3,  # SPAN_KIND_CLIENT
                                         "startTimeUnixNano": int((time.time() + 0.001) * 1_000_000_000),
-                                        "endTimeUnixNano": int((time.time() + 0.020) * 1_000_000_000),
+                                        "endTimeUnixNano": int((time.time() + 0.003) * 1_000_000_000),
                                         "attributes": [
-                                            {"key": "wasm.module_id", "value": {"stringValue": "chat"}},
-                                            {"key": "wasm.function", "value": {"stringValue": "send_message"}},
-                                            {"key": "wasm.execution_time_ms", "value": {"doubleValue": 19.0}}
+                                            {"key": "cache.key", "value": {"stringValue": "chirp_data_v1"}},
+                                            {"key": "cache.hit", "value": {"boolValue": True}},
+                                            {"key": "cache.ttl", "value": {"intValue": "3600"}}
                                         ],
                                         "status": {"code": 1}
                                     }
@@ -166,7 +166,7 @@ class TelemetryTester:
             
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'spacetimedb-telemetry-test/1.0'
+                'User-Agent': 'canary-api-telemetry-test/1.0'
             }
             
             response = requests.post(
@@ -198,30 +198,30 @@ class TelemetryTester:
                     {
                         "resource": {
                             "attributes": [
-                                {"key": "service.name", "value": {"stringValue": "spacetimedb"}},
-                                {"key": "service.version", "value": {"stringValue": "dev"}}
+                                {"key": "service.name", "value": {"stringValue": "canary-api"}},
+                                {"key": "service.version", "value": {"stringValue": "1.0.0"}}
                             ]
                         },
                         "scopeMetrics": [
                             {
                                 "scope": {
-                                    "name": "spacetimedb-metrics",
+                                    "name": "canary-api-metrics",
                                     "version": "1.0.0"
                                 },
                                 "metrics": [
                                     {
-                                        "name": "spacetimedb_database_operations_total",
-                                        "description": "Total number of database operations",
+                                        "name": "canary_requests_total",
+                                        "description": "Total number of API requests",
                                         "unit": "1",
                                         "sum": {
                                             "dataPoints": [
                                                 {
                                                     "attributes": [
-                                                        {"key": "operation", "value": {"stringValue": "insert"}},
-                                                        {"key": "table", "value": {"stringValue": "users"}}
+                                                        {"key": "method", "value": {"stringValue": "GET"}},
+                                                        {"key": "endpoint", "value": {"stringValue": "/chirp"}}
                                                     ],
                                                     "timeUnixNano": int(time.time() * 1_000_000_000),
-                                                    "asInt": "42"
+                                                    "asInt": "156"
                                                 }
                                             ],
                                             "aggregationTemporality": 2,  # CUMULATIVE
@@ -229,21 +229,21 @@ class TelemetryTester:
                                         }
                                     },
                                     {
-                                        "name": "spacetimedb_request_duration_seconds",
-                                        "description": "Request duration in seconds",
+                                        "name": "canary_response_duration_seconds",
+                                        "description": "API response time in seconds",
                                         "unit": "s",
                                         "histogram": {
                                             "dataPoints": [
                                                 {
                                                     "attributes": [
-                                                        {"key": "method", "value": {"stringValue": "POST"}},
-                                                        {"key": "endpoint", "value": {"stringValue": "/database/call"}}
+                                                        {"key": "method", "value": {"stringValue": "GET"}},
+                                                        {"key": "endpoint", "value": {"stringValue": "/chirp"}}
                                                     ],
                                                     "timeUnixNano": int(time.time() * 1_000_000_000),
-                                                    "count": "10",
-                                                    "sum": 0.5,
-                                                    "bucketCounts": ["0", "2", "5", "3", "0"],
-                                                    "explicitBounds": [0.01, 0.05, 0.1, 0.5]
+                                                    "count": "15",
+                                                    "sum": 0.3755,
+                                                    "bucketCounts": ["2", "8", "12", "15", "15"],
+                                                    "explicitBounds": [0.01, 0.025, 0.05, 0.1]
                                                 }
                                             ],
                                             "aggregationTemporality": 2
@@ -258,7 +258,7 @@ class TelemetryTester:
             
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'spacetimedb-telemetry-test/1.0'
+                'User-Agent': 'canary-api-telemetry-test/1.0'
             }
             
             response = requests.post(
@@ -313,20 +313,20 @@ class TelemetryTester:
         print_info("Checking Prometheus metrics...")
         
         try:
-            # Query for SpacetimeDB metrics
+            # Query for Canary API metrics
             response = requests.get(
                 'http://localhost:9090/api/v1/query',
-                params={'query': 'spacetimedb_database_operations_total'},
+                params={'query': 'canary_requests_total'},
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
                 if data.get('status') == 'success' and data.get('data', {}).get('result'):
-                    print_status("Found SpacetimeDB metrics in Prometheus")
+                    print_status("Found Canary API metrics in Prometheus")
                     return True
                 else:
-                    print_warning("No SpacetimeDB metrics found in Prometheus yet")
+                    print_warning("No Canary API metrics found in Prometheus yet")
                     return False
             else:
                 print_error(f"Prometheus query failed with status {response.status_code}")
@@ -355,7 +355,7 @@ class TelemetryTester:
 
     def run_all_tests(self):
         """Run all telemetry tests."""
-        print(f"{Colors.BLUE}🧪 SpacetimeDB Telemetry Pipeline Test{Colors.ENDC}")
+        print(f"{Colors.BLUE}🧪 Canary API Telemetry Pipeline Test{Colors.ENDC}")
         print(f"Data directory: {self.data_dir}")
         print()
         

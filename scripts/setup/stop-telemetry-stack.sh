@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SpacetimeDB Local Telemetry Stack Stop Script
+# Agent Observability Verifier Stop Script
 # This script stops all telemetry services and optionally cleans up data
 
 set -e
@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-echo -e "${BLUE}🛑 Stopping SpacetimeDB Local Telemetry Stack${NC}"
+echo -e "${BLUE}🛑 Stopping Agent Observability Verifier${NC}"
 
 # Function to print status
 print_status() {
@@ -94,11 +94,11 @@ fi
 
 # Show container status
 echo -e "\n${BLUE}Container Status:${NC}"
-if docker ps --filter "name=spacetimedb-" --format "table {{.Names}}\t{{.Status}}" | grep -q "spacetimedb-"; then
-    docker ps --filter "name=spacetimedb-" --format "table {{.Names}}\t{{.Status}}"
-    print_warning "Some SpacetimeDB telemetry containers are still running"
+if docker ps --filter "name=telemetry-nest-" --format "table {{.Names}}\t{{.Status}}" | grep -q "telemetry-nest-"; then
+    docker ps --filter "name=telemetry-nest-" --format "table {{.Names}}\t{{.Status}}"
+    print_warning "Some telemetry nest containers are still running"
 else
-    print_status "All SpacetimeDB telemetry containers are stopped"
+    print_status "All telemetry nest containers are stopped"
 fi
 
 # Clean data files if requested
@@ -128,7 +128,7 @@ fi
 if [ "$REMOVE_VOLUMES" = true ]; then
     echo -e "\n${BLUE}Removing Docker volumes...${NC}"
     
-    volumes=("spacetimedb-prometheus-data" "spacetimedb-grafana-data")
+    volumes=("telemetry-nest-prometheus-data" "telemetry-nest-grafana-data")
     
     for volume in "${volumes[@]}"; do
         if docker volume ls | grep -q "$volume"; then
@@ -143,25 +143,25 @@ if [ "$REMOVE_VOLUMES" = true ]; then
     done
 fi
 
-# Check for any remaining SpacetimeDB containers
+# Check for any remaining telemetry containers
 echo -e "\n${BLUE}Checking for remaining containers...${NC}"
-remaining_containers=$(docker ps -a --filter "name=spacetimedb-" --format "{{.Names}}" | wc -l)
+remaining_containers=$(docker ps -a --filter "name=telemetry-nest-" --format "{{.Names}}" | wc -l)
 
 if [ "$remaining_containers" -gt 0 ]; then
-    print_warning "Found $remaining_containers remaining SpacetimeDB containers"
+    print_warning "Found $remaining_containers remaining telemetry nest containers"
     echo "To remove them completely, run:"
-    echo "  docker ps -a --filter \"name=spacetimedb-\" --format \"{{.Names}}\" | xargs docker rm -f"
+    echo "  docker ps -a --filter \"name=telemetry-nest-\" --format \"{{.Names}}\" | xargs docker rm -f"
 else
-    print_status "No remaining SpacetimeDB containers found"
+    print_status "No remaining telemetry nest containers found"
 fi
 
 # Check for any remaining networks
-if docker network ls | grep -q "spacetimedb-telemetry-network"; then
-    print_warning "SpacetimeDB telemetry network still exists"
+if docker network ls | grep -q "telemetry-nest-network"; then
+    print_warning "Telemetry nest network still exists"
     echo "To remove it, run:"
-    echo "  docker network rm spacetimedb-telemetry-network"
+    echo "  docker network rm telemetry-nest-network"
 else
-    print_status "SpacetimeDB telemetry network is removed"
+    print_status "Telemetry nest network is removed"
 fi
 
 # Summary

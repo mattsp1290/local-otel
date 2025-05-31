@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SpacetimeDB Local Telemetry Environment Setup Script
+# Agent Observability Verifier Setup Script
 # This script sets up the complete Docker-based telemetry environment
 
 set -e
@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-echo -e "${BLUE}🚀 Setting up SpacetimeDB Local Telemetry Environment${NC}"
+echo -e "${BLUE}🦅 Setting up Agent Observability Verifier${NC}"
 echo "Project root: $PROJECT_ROOT"
 
 # Function to print status
@@ -98,27 +98,27 @@ print_status "Permissions set"
 
 # Create Docker network
 echo -e "\n${BLUE}Setting up Docker network...${NC}"
-if docker network ls | grep -q "spacetimedb-telemetry-network"; then
-    print_warning "Network spacetimedb-telemetry-network already exists"
+if docker network ls | grep -q "telemetry-nest-network"; then
+    print_warning "Network telemetry-nest-network already exists"
 else
-    docker network create spacetimedb-telemetry-network
-    print_status "Created Docker network: spacetimedb-telemetry-network"
+    docker network create telemetry-nest-network
+    print_status "Created Docker network: telemetry-nest-network"
 fi
 
 # Create Docker volumes
 echo -e "\n${BLUE}Setting up Docker volumes...${NC}"
-if docker volume ls | grep -q "spacetimedb-prometheus-data"; then
-    print_warning "Volume spacetimedb-prometheus-data already exists"
+if docker volume ls | grep -q "telemetry-nest-prometheus-data"; then
+    print_warning "Volume telemetry-nest-prometheus-data already exists"
 else
-    docker volume create spacetimedb-prometheus-data
-    print_status "Created Docker volume: spacetimedb-prometheus-data"
+    docker volume create telemetry-nest-prometheus-data
+    print_status "Created Docker volume: telemetry-nest-prometheus-data"
 fi
 
-if docker volume ls | grep -q "spacetimedb-grafana-data"; then
-    print_warning "Volume spacetimedb-grafana-data already exists"
+if docker volume ls | grep -q "telemetry-nest-grafana-data"; then
+    print_warning "Volume telemetry-nest-grafana-data already exists"
 else
-    docker volume create spacetimedb-grafana-data
-    print_status "Created Docker volume: spacetimedb-grafana-data"
+    docker volume create telemetry-nest-grafana-data
+    print_status "Created Docker volume: telemetry-nest-grafana-data"
 fi
 
 # Pull Docker images
@@ -147,11 +147,11 @@ done
 # Create environment file
 echo -e "\n${BLUE}Creating environment configuration...${NC}"
 cat > .env << EOF
-# SpacetimeDB Local Telemetry Environment Configuration
+# Agent Observability Verifier Configuration
 
 # Environment
 ENVIRONMENT=local-development
-PROJECT_NAME=spacetimedb
+PROJECT_NAME=canary-api
 
 # OpenTelemetry Collector
 OTEL_COLLECTOR_CONFIG_PATH=./docker/configs/otel/otel-collector-config.yaml
@@ -181,7 +181,7 @@ TRACES_PATH=./data/traces
 PROCESSED_PATH=./data/processed
 
 # Network
-TELEMETRY_NETWORK=spacetimedb-telemetry-network
+TELEMETRY_NETWORK=telemetry-nest-network
 
 # Ports
 OTEL_GRPC_PORT=4317
@@ -255,5 +255,5 @@ echo ""
 echo "4. View telemetry data files:"
 echo "   ls -la data/"
 echo ""
-echo -e "${YELLOW}Note: SpacetimeDB server integration requires additional configuration.${NC}"
-echo "See docs/spacetimedb-integration.md for details."
+echo -e "${YELLOW}Note: Application integration requires additional configuration.${NC}"
+echo "See docs/application-integration-guide.md for details."

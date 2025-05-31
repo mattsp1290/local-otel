@@ -1,11 +1,11 @@
-# SpacetimeDB Telemetry Integration Test Guide
+# Agent Observability Verifier - Integration Test Guide
 
 ## 🚀 Quick Start (Once Docker is Running)
 
 ### Prerequisites
 ✅ **Docker Desktop**: Installed and running  
-✅ **Python 3.12.8**: Available  
-✅ **Go 1.23.4**: Available  
+✅ **Python 3.12+**: Available  
+✅ **Go 1.21+**: Available  
 ✅ **All scripts**: Executable and ready  
 
 ### Step-by-Step Integration Testing
@@ -62,7 +62,7 @@ go run trace_generator.go
 ```
 **Expected Output:**
 - ✓ OpenTelemetry Collector availability check
-- ✓ 10 realistic SpacetimeDB traces generated
+- ✓ 10 realistic application traces generated
 - ✓ All traces sent successfully
 - ✓ Jaeger UI link provided
 
@@ -89,10 +89,11 @@ cat data/traces/traces.jsonl | head -5
 # Metrics (JSON/Prometheus format)
 ls -la data/metrics/
 cat data/metrics/metrics.jsonl | head -5
+cat data/metrics/metrics.prom | grep canary
 
 # Logs (JSON format)
 ls -la data/logs/
-cat data/logs/logs.jsonl | head -5
+cat data/logs/canary-api-logs.jsonl | head -5
 
 # Processed logs (Filebeat output)
 ls -la data/processed/
@@ -117,6 +118,12 @@ ls -la data/processed/
 2. Restart and verify recovery
 3. Check data continuity
 4. Validate health checks
+
+### Scenario 4: Application Integration
+1. Run example application (see `docs/application-integration-guide.md`)
+2. Generate traffic to endpoints (/chirp, /nest, /flock)
+3. Verify traces in Jaeger
+4. Check metrics in Prometheus/Grafana
 
 ## 🔧 Troubleshooting
 
@@ -156,7 +163,7 @@ chmod -R 755 data/
 - All service endpoints responding
 - Test data flowing through pipeline
 - Files being created in all directories
-- Dashboards showing SpacetimeDB data
+- Dashboards showing application data
 - 100% test pass rate
 
 ### ✅ **Partial Success** (80%+)
@@ -175,10 +182,56 @@ chmod -R 755 data/
 
 ## 🚀 Next Steps After Success
 
-1. **SpacetimeDB Integration**: Follow `docs/spacetimedb-integration.md`
-2. **Custom Dashboards**: Create SpacetimeDB-specific Grafana dashboards
+1. **Application Integration**: Follow `docs/application-integration-guide.md`
+2. **Custom Dashboards**: Create application-specific Grafana dashboards
 3. **Production Setup**: Adapt configuration for production deployment
 4. **Monitoring**: Set up alerting and monitoring rules
+
+## 🐦 Testing with Canary API
+
+Quick test with our example API:
+
+```bash
+# Send metrics via StatsD
+echo "canary.requests:1|c|#endpoint:chirp,method:GET" | nc -u -w0 localhost 8125
+echo "canary.response_time:42|ms|#endpoint:nest" | nc -u -w0 localhost 8125
+
+# Send trace via OTLP HTTP
+curl -X POST http://localhost:4318/v1/traces \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resourceSpans": [{
+      "resource": {
+        "attributes": [{
+          "key": "service.name",
+          "value": {"stringValue": "canary-api"}
+        }]
+      },
+      "scopeSpans": [{
+        "scope": {"name": "test"},
+        "spans": [{
+          "traceId": "5b8aa5a2d2c872e8321cf37308d69df2",
+          "spanId": "051581bf3cb55c13",
+          "name": "chirp-request",
+          "startTimeUnixNano": "'$(date +%s%N)'",
+          "endTimeUnixNano": "'$(date +%s%N)'",
+          "kind": 2,
+          "attributes": [{
+            "key": "http.method",
+            "value": {"stringValue": "GET"}
+          }, {
+            "key": "http.path",
+            "value": {"stringValue": "/chirp"}
+          }]
+        }]
+      }]
+    }]
+  }'
+
+# Check results
+docker logs telemetry-nest-otel-collector | tail -20
+ls -la data/traces/
+```
 
 ## 📝 Test Results Template
 

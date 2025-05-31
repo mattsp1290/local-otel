@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SpacetimeDB Local Telemetry Stack Start Script
+# Agent Observability Verifier Start Script
 # This script starts all telemetry services using Docker Compose
 
 set -e
@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-echo -e "${BLUE}🚀 Starting SpacetimeDB Local Telemetry Stack${NC}"
+echo -e "${BLUE}🦅 Starting Agent Observability Verifier${NC}"
 
 # Function to print status
 print_status() {
@@ -186,4 +186,4 @@ echo ""
 echo "4. Stop the stack:"
 echo "   ./scripts/setup/stop-telemetry-stack.sh"
 
-echo -e "\n${YELLOW}Note: To integrate with SpacetimeDB, see docs/spacetimedb-integration.md${NC}"
+echo -e "\n${YELLOW}Note: To integrate with your application, see docs/application-integration-guide.md${NC}"

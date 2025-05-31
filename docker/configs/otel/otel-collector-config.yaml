@@ -34,7 +34,7 @@ processors:
   attributes:
     actions:
       - key: service.name
-        value: spacetimedb
+        value: canary-api
         action: upsert
       - key: service.version
         from_attribute: version
@@ -48,7 +48,7 @@ processors:
       include:
         match_type: regexp
         metric_names:
-          - spacetimedb\..*
+          - canary\..*
           - otel\..*
           - system\..*
 
@@ -80,7 +80,7 @@ exporters:
     endpoint: "0.0.0.0:8889"
     const_labels:
       environment: local-development
-      service: spacetimedb
+      service: canary-api
 
   # OTLP exporter for Jaeger
   otlp/jaeger:

@@ -28,14 +28,14 @@ filebeat.inputs:
   json.keys_under_root: true
   json.add_error_key: true
 
-# Monitor SpacetimeDB application logs (when available)
+# Monitor application logs (when available)
 - type: log
   enabled: true
   paths:
-    - /data/logs/spacetimedb*.log
+    - /data/logs/canary*.log
     - /data/logs/application*.log
   fields:
-    service: spacetimedb
+    service: canary-api
     environment: local-development
   fields_under_root: true
   multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
@@ -92,30 +92,30 @@ processors:
         }
       }
 
-# Add SpacetimeDB-specific fields
+# Add application-specific fields
 - script:
     lang: javascript
-    id: add_spacetimedb_fields
+    id: add_application_fields
     source: >
       function process(event) {
         var message = event.Get("message");
-        if (message && event.Get("service") === "spacetimedb") {
-          // Extract module ID
-          var moduleMatch = message.match(/module[_\s]+id[=:\s]+([a-zA-Z0-9_-]+)/i);
-          if (moduleMatch) {
-            event.Put("spacetimedb.module_id", moduleMatch[1]);
+        if (message && event.Get("service") === "canary-api") {
+          // Extract endpoint
+          var endpointMatch = message.match(/endpoint[=:\s]+([/a-zA-Z0-9_-]+)/i);
+          if (endpointMatch) {
+            event.Put("canary.endpoint", endpointMatch[1]);
           }
           
-          // Extract database name
-          var dbMatch = message.match(/database[=:\s]+([a-zA-Z0-9_-]+)/i);
-          if (dbMatch) {
-            event.Put("spacetimedb.database_name", dbMatch[1]);
+          // Extract HTTP method
+          var methodMatch = message.match(/method[=:\s]+(GET|POST|PUT|DELETE|PATCH)/i);
+          if (methodMatch) {
+            event.Put("canary.http_method", methodMatch[1]);
           }
           
-          // Extract operation type
-          var opMatch = message.match(/operation[=:\s]+([a-zA-Z0-9_-]+)/i);
-          if (opMatch) {
-            event.Put("spacetimedb.operation", opMatch[1]);
+          // Extract response status
+          var statusMatch = message.match(/status[=:\s]+([0-9]{3})/i);
+          if (statusMatch) {
+            event.Put("canary.status_code", statusMatch[1]);
           }
         }
       }
@@ -154,7 +154,7 @@ output.file:
 # output.elasticsearch:
 #   enabled: false
 #   hosts: ["elasticsearch:9200"]
-#   index: "spacetimedb-logs-%{+yyyy.MM.dd}"
+#   index: "canary-logs-%{+yyyy.MM.dd}"
 
 logging.level: info
 logging.to_files: true

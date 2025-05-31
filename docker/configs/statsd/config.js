@@ -1,5 +1,5 @@
 module.exports = {
-  // StatsD server configuration for SpacetimeDB telemetry
+  // StatsD server configuration for Agent Observability Verifier
   
   // Network configuration
   port: 8125,
@@ -25,7 +25,7 @@ module.exports = {
   graphitePort: 2003,
   graphite: {
     legacyNamespace: false,
-    globalPrefix: "spacetimedb",
+    globalPrefix: "canary",
     prefixCounter: "counters",
     prefixTimer: "timers",
     prefixGauge: "gauges",
@@ -42,15 +42,15 @@ module.exports = {
   // Histogram configuration
   histogram: [
     {
-      metric: "spacetimedb.database.query_time",
+      metric: "canary.api.response_time",
       bins: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
     },
     {
-      metric: "spacetimedb.wasm.execution_time", 
-      bins: [0.01, 0.05, 0.1, 0.5, 1.0, 2.0]
+      metric: "canary.api.request_size", 
+      bins: [100, 500, 1000, 5000, 10000, 50000]
     },
     {
-      metric: "spacetimedb.api.request_duration",
+      metric: "canary.api.request_duration",
       bins: [0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
     }
   ],
@@ -58,8 +58,8 @@ module.exports = {
   // Metric name mapping and validation
   keyNameSanitize: true,
   
-  // SpacetimeDB specific metric namespaces
-  prefixStats: "spacetimedb",
+  // Application specific metric namespaces
+  prefixStats: "canary",
   
   // Logging configuration
   log: {

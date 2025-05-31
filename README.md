@@ -1,6 +1,6 @@
-# SpacetimeDB Local OpenTelemetry Environment
+# 🦅 Agent Observability Verifier
 
-A comprehensive Docker-based local telemetry environment for SpacetimeDB development, featuring OpenTelemetry Collector, StatsD, Prometheus, Grafana, Jaeger, and Filebeat with file-based exports for integration testing.
+A comprehensive Docker-based telemetry verification environment designed for AI agents to validate traces, metrics, and logs are properly collected from any application. Features OpenTelemetry Collector, StatsD, Prometheus, Grafana, Jaeger, and Filebeat with file-based exports for integration testing.
 
 ## 🚀 Quick Start
 
@@ -27,22 +27,23 @@ A comprehensive Docker-based local telemetry environment for SpacetimeDB develop
 
 ## 📋 Overview
 
-This environment provides a complete local telemetry stack that:
+This environment provides a complete local telemetry verification stack that:
 
-- ✅ **Collects traces, metrics, and logs** from SpacetimeDB
+- ✅ **Collects traces, metrics, and logs** from any application
 - ✅ **Exports data to files** for integration testing
 - ✅ **Provides real-time visualization** with Grafana and Jaeger
 - ✅ **Supports StatsD metrics** for high-performance metric collection
 - ✅ **Processes logs** with Filebeat for correlation and analysis
 - ✅ **Runs entirely in Docker** for consistent environments
 - ✅ **Includes verification scripts** in Python, Go, and Bash
+- ✅ **AI Agent Optimized** - designed for automated observability verification
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   SpacetimeDB   │───▶│ OpenTelemetry    │───▶│ File Exports    │
-│                 │    │ Collector        │    │ (JSON/CSV/JSONL)│
+│ Your Application│───▶│ OpenTelemetry    │───▶│ File Exports    │
+│  (Canary API)   │    │ Collector        │    │ (JSON/CSV/JSONL)│
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                       │                       │
          │                       ▼                       ▼
@@ -89,7 +90,7 @@ local-otel/
 │   │   └── bash/                   # Bash verification scripts
 │   └── automation/                 # Additional automation
 └── docs/
-    └── spacetimedb-integration.md  # SpacetimeDB integration guide
+    └── application-integration-guide.md  # Application integration guide
 ```
 
 ## 🔧 Services
@@ -105,7 +106,7 @@ local-otel/
 
 ## 📊 Telemetry Endpoints
 
-### For SpacetimeDB Integration
+### For Application Integration
 
 - **OTLP Traces/Metrics (gRPC)**: `localhost:4317`
 - **OTLP Traces/Metrics (HTTP)**: `localhost:4318`
@@ -113,20 +114,42 @@ local-otel/
 
 ### Example Usage
 
-```rust
-// OpenTelemetry traces
-let tracer = opentelemetry_otlp::new_pipeline()
-    .tracing()
-    .with_exporter(
-        opentelemetry_otlp::new_exporter()
-            .http()
-            .with_endpoint("http://localhost:4318/v1/traces")
-    )
-    .install_batch(opentelemetry_sdk::runtime::Tokio)?;
+```python
+# Python OpenTelemetry example
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-// StatsD metrics
-let client = statsd::Client::new("localhost:8125", "spacetimedb")?;
-client.count("spacetimedb.database.inserts", 1);
+# Setup tracing
+trace.set_tracer_provider(TracerProvider())
+tracer = trace.get_tracer(__name__)
+
+# Configure OTLP exporter
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://localhost:4318/v1/traces",
+)
+span_processor = BatchSpanProcessor(otlp_exporter)
+trace.get_tracer_provider().add_span_processor(span_processor)
+
+# Create spans
+with tracer.start_as_current_span("canary_chirp"):
+    # Your application logic here
+    pass
+```
+
+```javascript
+// Node.js StatsD example
+const StatsD = require('node-statsd');
+const client = new StatsD({
+  host: 'localhost',
+  port: 8125,
+  prefix: 'canary.'
+});
+
+// Send metrics
+client.increment('requests_total', 1, {endpoint: '/chirp'});
+client.timing('response_duration', 42, {endpoint: '/chirp'});
 ```
 
 ## 📄 File Exports
@@ -219,39 +242,56 @@ ls -la data/processed/
 ./scripts/setup/start-telemetry-stack.sh
 
 # Stop all services
-docker-compose down
+./scripts/setup/stop-telemetry-stack.sh
 
-# Restart specific service
-docker-compose restart otel-collector
-```
+# Stop and clean data
+./scripts/setup/stop-telemetry-stack.sh --clean-data
 
-### Reset Environment
-```bash
-# Clean reset
-docker-compose down -v
+# Full reset
+./scripts/setup/stop-telemetry-stack.sh --clean-data --remove-volumes
 ./scripts/setup/setup-telemetry-env.sh
-./scripts/setup/start-telemetry-stack.sh
 ```
 
-## 🔗 SpacetimeDB Integration
+## 🤖 AI Agent Usage
 
-See [docs/spacetimedb-integration.md](docs/spacetimedb-integration.md) for detailed instructions on integrating SpacetimeDB with this telemetry environment.
+This environment is specifically designed for AI agents to add and verify observability:
 
-### Quick Integration Test
+### For AI Agents
+1. Read `AGENT_QUICKSTART.md` for a concise overview
+2. Use the verification scripts to confirm telemetry is working
+3. Follow the patterns in `examples/` for different languages
+4. Check `data/` directories for exported telemetry data
 
-1. Start the telemetry environment
-2. Configure SpacetimeDB with telemetry enabled:
-   ```bash
-   export SPACETIMEDB_TELEMETRY_ENABLED=true
-   export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-   export STATSD_HOST=localhost
-   ```
-3. Run SpacetimeDB and perform operations
-4. Check for telemetry data:
-   ```bash
-   ls -la data/traces/
-   ls -la data/metrics/
-   ```
+### Common AI Agent Tasks
+```bash
+# Add observability to a web service
+# 1. Instrument the code (see examples/)
+# 2. Start the telemetry stack
+# 3. Run the application
+# 4. Verify with:
+./scripts/verification/bash/check_telemetry_health.sh
+
+# Debug missing telemetry
+# 1. Check service health
+# 2. Verify endpoints are correct
+# 3. Check data files for output
+ls -la data/traces/ data/metrics/ data/logs/
+```
+
+## 🐦 Example: Canary API Integration
+
+Our example "Canary API" demonstrates common web service patterns:
+
+### Endpoints
+- `/chirp` - Quick health check endpoint
+- `/nest` - Data creation endpoint  
+- `/flock` - Batch operations endpoint
+
+### Metrics
+- `canary_requests_total` - Request counter by method/endpoint/status
+- `canary_response_duration_seconds` - Response time histogram
+- `canary_active_connections` - Current connection gauge
+- `canary_error_rate` - Error percentage by endpoint
 
 ## 🐛 Troubleshooting
 
@@ -266,8 +306,8 @@ docker info
 lsof -i :4317 -i :4318 -i :8125 -i :9090 -i :3000
 
 # Reset everything
-docker-compose down -v
-docker system prune -f
+./scripts/setup/stop-telemetry-stack.sh --clean-data --remove-volumes
+./scripts/setup/setup-telemetry-env.sh
 ```
 
 **No telemetry data:**
@@ -275,8 +315,8 @@ docker system prune -f
 # Check OpenTelemetry Collector health
 curl http://localhost:13133/
 
-# Check if SpacetimeDB is sending data
-docker-compose logs otel-collector | grep -i "received"
+# Check logs for errors
+docker-compose logs otel-collector | grep -i "error"
 
 # Verify configuration
 ./scripts/verification/bash/check_telemetry_health.sh
@@ -301,18 +341,18 @@ The telemetry environment is optimized for development use:
 
 - **Low latency**: Sub-second data processing
 - **High throughput**: Handles thousands of metrics/traces per second
-- **Minimal overhead**: <5% performance impact on SpacetimeDB
+- **Minimal overhead**: <5% performance impact on your application
 - **Efficient storage**: Compressed file exports with rotation
 
 ## 🔮 Future Enhancements
 
-- [ ] Custom Grafana dashboards for SpacetimeDB
-- [ ] Alerting rules for critical metrics
-- [ ] Cloud deployment configurations
-- [ ] Performance regression testing
-- [ ] Multi-instance distributed tracing
-- [ ] Advanced log analysis with ML
+- [ ] Language-specific instrumentation examples
+- [ ] Pre-built Grafana dashboards for common patterns
+- [ ] Cloud provider migration guides
+- [ ] Performance regression testing suite
+- [ ] Multi-service distributed tracing examples
+- [ ] Advanced log correlation features
 
 ## 📝 License
 
-This telemetry environment is part of the SpacetimeDB project and follows the same licensing terms.
+This project is open source and available under the [MIT License](LICENSE).

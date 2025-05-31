@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SpacetimeDB Telemetry Health Check Script
+# Agent Observability Verifier Health Check Script
 # This script verifies that all telemetry services are running and healthy
 
 set -e
@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-echo -e "${BLUE}🔍 SpacetimeDB Telemetry Health Check${NC}"
+echo -e "${BLUE}🔍 Agent Observability Verifier Health Check${NC}"
 
 # Function to print status
 print_status() {
@@ -51,7 +51,7 @@ fi
 echo -e "\n${BLUE}Checking Docker containers...${NC}"
 
 services=("otel-collector" "statsd" "prometheus" "grafana" "jaeger" "filebeat")
-container_names=("spacetimedb-otel-collector" "spacetimedb-statsd" "spacetimedb-prometheus" "spacetimedb-grafana" "spacetimedb-jaeger" "spacetimedb-filebeat")
+container_names=("telemetry-nest-otel-collector" "telemetry-nest-statsd" "telemetry-nest-prometheus" "telemetry-nest-grafana" "telemetry-nest-jaeger" "telemetry-nest-filebeat")
 
 for i in "${!services[@]}"; do
     service="${services[$i]}"
@@ -133,13 +133,13 @@ fi
 echo -e "\n${BLUE}Checking container network connectivity...${NC}"
 
 # Test if otel-collector can reach other services
-if docker exec spacetimedb-otel-collector nc -z prometheus 9090 2>/dev/null; then
+if docker exec telemetry-nest-otel-collector nc -z prometheus 9090 2>/dev/null; then
     print_status "OTel Collector can reach Prometheus"
 else
     print_warning "OTel Collector cannot reach Prometheus"
 fi
 
-if docker exec spacetimedb-otel-collector nc -z jaeger 14250 2>/dev/null; then
+if docker exec telemetry-nest-otel-collector nc -z jaeger 14250 2>/dev/null; then
     print_status "OTel Collector can reach Jaeger"
 else
     print_warning "OTel Collector cannot reach Jaeger"
@@ -214,7 +214,7 @@ echo -e "\n${BLUE}Health Check Summary${NC}"
 
 # Count successful checks
 total_containers=${#services[@]}
-running_containers=$(docker ps --filter "name=spacetimedb-" --format "table {{.Names}}" | grep -c "spacetimedb-" || echo "0")
+running_containers=$(docker ps --filter "name=telemetry-nest-" --format "table {{.Names}}" | grep -c "telemetry-nest-" || echo "0")
 
 echo "• Containers: $running_containers/$total_containers running"
 
