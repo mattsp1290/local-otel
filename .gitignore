@@ -26,3 +26,12 @@ go.work.sum
 
 # env file
 .env
+
+# Python cache directories
+**/__pycache__/
+
+# Node.js dependencies
+**/node_modules/
+
+# Test reports
+examples/distributed/social-media/tests/reports/

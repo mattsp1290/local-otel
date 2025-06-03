@@ -2,8 +2,11 @@
 
 A comprehensive Docker-based telemetry verification environment designed for AI agents to validate traces, metrics, and logs are properly collected from any application. Features OpenTelemetry Collector, StatsD, Prometheus, Grafana, Jaeger, and Filebeat with file-based exports for integration testing.
 
+**🚀 NEW: Now with SigNoz integration!** Get traces, metrics, and logs in a single pane of glass while maintaining file exports for testing. See [QUICK_START_SIGNOZ.md](QUICK_START_SIGNOZ.md) for details.
+
 ## 🚀 Quick Start
 
+### Option 1: Original Stack
 1. **Setup the environment:**
    ```bash
    ./scripts/setup/setup-telemetry-env.sh
@@ -14,12 +17,23 @@ A comprehensive Docker-based telemetry verification environment designed for AI 
    ./scripts/setup/start-telemetry-stack.sh
    ```
 
+### Option 2: SigNoz-Enhanced Stack (Recommended)
+1. **Start the SigNoz-enhanced stack:**
+   ```bash
+   ./scripts/setup/start-signoz-stack.sh
+   ```
+
+2. **Access SigNoz UI:**
+   - Open http://localhost:3301 in your browser
+   - All your existing integrations continue to work!
+
 3. **Verify everything is working:**
    ```bash
    ./scripts/verification/bash/check_telemetry_health.sh
    ```
 
 4. **Access the dashboards:**
+   - **SigNoz**: http://localhost:3301 (NEW - unified observability)
    - **Grafana**: http://localhost:3000 (admin/admin)
    - **Prometheus**: http://localhost:9090
    - **Jaeger**: http://localhost:16686
@@ -37,6 +51,8 @@ This environment provides a complete local telemetry verification stack that:
 - ✅ **Runs entirely in Docker** for consistent environments
 - ✅ **Includes verification scripts** in Python, Go, and Bash
 - ✅ **AI Agent Optimized** - designed for automated observability verification
+- ✅ **Dual Export Mode** - data flows to both SigNoz and file system
+- ✅ **Unified Observability** - SigNoz provides APM, logs, and metrics in one UI
 
 ## 🏗️ Architecture
 
