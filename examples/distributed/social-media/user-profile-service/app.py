@@ -39,11 +39,22 @@ STATSD_PORT = int(os.getenv("STATSD_PORT", "8125"))
 tracer = init_telemetry()
 
 # Initialize StatsD client
-statsd_client = statsd.StatsClient(
-    host=STATSD_HOST,
-    port=STATSD_PORT,
-    prefix='user_profile_service'
-)
+try:
+    statsd_client = statsd.StatsClient(
+        host=STATSD_HOST,
+        port=STATSD_PORT,
+        prefix='user_profile_service'
+    )
+except Exception as e:
+    logger.warning(f"Failed to initialize StatsD client: {e}")
+    # Create a dummy client that does nothing
+    class DummyStatsClient:
+        def incr(self, *args, **kwargs): pass
+        def decr(self, *args, **kwargs): pass
+        def timing(self, *args, **kwargs): pass
+        def gauge(self, *args, **kwargs): pass
+        def set(self, *args, **kwargs): pass
+    statsd_client = DummyStatsClient()
 
 # Setup logging
 setup_logging()

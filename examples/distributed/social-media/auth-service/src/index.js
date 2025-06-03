@@ -34,12 +34,8 @@ app.use(express.urlencoded({ extended: true }));
 // Tracing middleware
 app.use(tracingMiddleware);
 
-// Rate limiting with Redis
+// Rate limiting (using memory store for now)
 const limiter = rateLimit({
-  store: new (require('rate-limit-redis'))({
-    client: redisClient,
-    prefix: 'rl:',
-  }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP',

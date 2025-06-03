@@ -1,0 +1,5 @@
+package local:otel-component;
+
+world otel-component {
+  export opentelemetry:sdk/telemetry@1.0.0;
+}

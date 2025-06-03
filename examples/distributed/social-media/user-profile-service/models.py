@@ -22,7 +22,7 @@ class UserProfile(Base):
     
     # Indexes for search
     __table_args__ = (
-        Index('idx_display_name_search', 'display_name', postgresql_using='gin'),
+        Index('idx_display_name_search', 'display_name'),
     )
     
     @classmethod

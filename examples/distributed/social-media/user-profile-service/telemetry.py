@@ -48,7 +48,7 @@ def init_telemetry():
     set_global_textmap(TraceContextTextMapPropagator())
     
     # Auto-instrument libraries
-    FastAPIInstrumentor.instrument(tracer_provider=provider)
+    FastAPIInstrumentor().instrument(tracer_provider=provider)
     SQLAlchemyInstrumentor().instrument(tracer_provider=provider)
     RedisInstrumentor().instrument(tracer_provider=provider)
     HTTPXClientInstrumentor().instrument(tracer_provider=provider)
